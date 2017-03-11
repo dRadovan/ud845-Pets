@@ -2,6 +2,7 @@ package com.example.android.pets.data;
 
 import android.provider.BaseColumns;
 
+
 /**
  * Contract for Pets app
  */
@@ -14,10 +15,10 @@ public final class PetContract {
 
         public static final String TABLE_NAME = "pets";
         public static final String _ID = BaseColumns._ID;
-        public static final String COLUMN_NAME = "name";
-        public static final String COLUMN_GENDER = "gender";
-        public static final String COLUMN_BREED = "breed";
-        public static final String COLUMN_WEIGHT = "weight";
+        public static final String COLUMN__PET_NAME = "name";
+        public static final String COLUMN_PET_GENDER = "gender";
+        public static final String COLUMN_PET_BREED = "breed";
+        public static final String COLUMN_PET_WEIGHT = "weight";
 
         /**
          * Possible values for the pet's gender
