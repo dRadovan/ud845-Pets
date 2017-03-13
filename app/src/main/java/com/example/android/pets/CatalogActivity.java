@@ -62,7 +62,6 @@ public class CatalogActivity extends AppCompatActivity {
         // To access our database, we instantiate our subclass of SQLiteOpenHelper
         // and pass the context, which is the current activity.
         mDbHelper = new PetDbHelper(this);
-        displayDatabaseInfo();
     }
 
     @Override
@@ -91,24 +90,28 @@ public class CatalogActivity extends AppCompatActivity {
         // to get a Cursor that contains all rows from the pets table.
         Cursor c = db.query(PetEntry.TABLE_NAME, projection, null, null, null, null, null);
 
-        int idColumnIndex = c.getColumnIndex(PetEntry._ID);
-        int nameColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_NAME);
-        int breedComunIndex = c.getColumnIndex(PetEntry.COLUMN_PET_BREED);
-        int genderColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
-        int weightColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
-
+        // Find TextView on which to display data from the cursor
+        TextView displayView = (TextView) findViewById(R.id.text_view_pet);
 
         try {
-            // Display the number of rows in the Cursor (which reflects the number of rows in the
-            // pets table in the database).
-            TextView displayView = (TextView) findViewById(R.id.text_view_pet);
+
+            // Find index of each column we want data from
+            int idColumnIndex = c.getColumnIndex(PetEntry._ID);
+            int nameColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_NAME);
+            int breedComunIndex = c.getColumnIndex(PetEntry.COLUMN_PET_BREED);
+            int genderColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
+            int weightColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
+
+            // Build a String to display with StringBuilder
             StringBuilder sb = new StringBuilder();
             sb.append("Number of rows in pets database table: " + c.getCount() + "\n");
             sb.append("\n");
             sb.append("id - name - breed - gender - weight");
             sb.append("\n");
+            // Gender of a pet to display
             String petGender = "";
 
+            // Logic to build the string to display
             while (c.moveToNext()){
                 sb.append("\n");
                 sb.append(c.getInt(idColumnIndex) + " - ");
@@ -136,6 +139,7 @@ public class CatalogActivity extends AppCompatActivity {
         }
     }
 
+    // Helper function to isnert dummy data
     private void insertPet(){
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 

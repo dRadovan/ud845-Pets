@@ -112,6 +112,7 @@ public class EditorActivity extends AppCompatActivity {
         });
     }
 
+    // Helper function to insert a pet into the table
     private void insertPet(){
         PetDbHelper mDbHelper = new PetDbHelper(this);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -128,6 +129,7 @@ public class EditorActivity extends AppCompatActivity {
 
         long insertRowId = db.insert(PetEntry.TABLE_NAME, null, values);
 
+        // Display a toast if there was an error inserting pet or if it was successful
         if (insertRowId == -1){
             Toast.makeText(getApplicationContext(), "Error with saving the pet", Toast.LENGTH_SHORT).show();
         } else
