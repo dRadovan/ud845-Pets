@@ -23,6 +23,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +32,9 @@ import android.widget.TextView;
 import com.example.android.pets.data.PetContract.PetEntry;
 
 import com.example.android.pets.data.PetDbHelper;
+
+import static android.R.attr.id;
+import static android.R.attr.name;
 
 /**
  * Displays list of pets that were entered and stored in the app.
@@ -77,19 +81,54 @@ public class CatalogActivity extends AppCompatActivity {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         // projection for query method
-        // i just want the ids
-        String[] projection = {PetEntry._ID};
+        String[] projection = {PetEntry._ID,
+                PetEntry.COLUMN_PET_NAME,
+                PetEntry.COLUMN_PET_BREED,
+                PetEntry.COLUMN_PET_GENDER,
+                PetEntry.COLUMN_PET_WEIGHT};
 
         // Perform this raw SQL query "SELECT * FROM pets"
         // to get a Cursor that contains all rows from the pets table.
         Cursor c = db.query(PetEntry.TABLE_NAME, projection, null, null, null, null, null);
+
+        int idColumnIndex = c.getColumnIndex(PetEntry._ID);
+        int nameColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_NAME);
+        int breedComunIndex = c.getColumnIndex(PetEntry.COLUMN_PET_BREED);
+        int genderColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
+        int weightColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
 
 
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
             // pets table in the database).
             TextView displayView = (TextView) findViewById(R.id.text_view_pet);
-            displayView.setText("Number of rows in pets database table: " + c.getCount());
+            StringBuilder sb = new StringBuilder();
+            sb.append("Number of rows in pets database table: " + c.getCount() + "\n");
+            sb.append("\n");
+            sb.append("id - name - breed - gender - weight");
+            sb.append("\n");
+            String petGender = "";
+
+            while (c.moveToNext()){
+                sb.append("\n");
+                sb.append(c.getInt(idColumnIndex) + " - ");
+                sb.append(c.getString(nameColumnIndex) + " - ");
+                sb.append(c.getString(breedComunIndex) + " - ");
+                switch (c.getInt(genderColumnIndex)){
+                    case PetEntry.GENDER_MALE:
+                        petGender = getString(R.string.gender_male);
+                        break;
+                    case PetEntry.GENDER_FEMALE:
+                        petGender = getString(R.string.gender_female);
+                        break;
+                    default:
+                        petGender = getString(R.string.gender_unknown);
+                        break;
+                }
+                sb.append(petGender + " - ");
+                sb.append(c.getInt(weightColumnIndex));
+            }
+            displayView.setText(sb.toString());
         } finally {
             // Always close the cursor when you're done reading from it. This releases all its
             // resources and makes it invalid.
