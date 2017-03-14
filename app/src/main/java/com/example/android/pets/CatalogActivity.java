@@ -76,9 +76,6 @@ public class CatalogActivity extends AppCompatActivity {
      */
     private void displayDatabaseInfo() {
 
-        // Create and/or open a database to read from it
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
         // projection for query method
         String[] projection = {PetEntry._ID,
                 PetEntry.COLUMN_PET_NAME,
@@ -86,9 +83,7 @@ public class CatalogActivity extends AppCompatActivity {
                 PetEntry.COLUMN_PET_GENDER,
                 PetEntry.COLUMN_PET_WEIGHT};
 
-        // Perform this raw SQL query "SELECT * FROM pets"
-        // to get a Cursor that contains all rows from the pets table.
-        Cursor c = db.query(PetEntry.TABLE_NAME, projection, null, null, null, null, null);
+        Cursor cursor = getContentResolver().query(PetEntry.CONTENT_URI, projection, null, null, null);
 
         // Find TextView on which to display data from the cursor
         TextView displayView = (TextView) findViewById(R.id.text_view_pet);
@@ -96,15 +91,15 @@ public class CatalogActivity extends AppCompatActivity {
         try {
 
             // Find index of each column we want data from
-            int idColumnIndex = c.getColumnIndex(PetEntry._ID);
-            int nameColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_NAME);
-            int breedComunIndex = c.getColumnIndex(PetEntry.COLUMN_PET_BREED);
-            int genderColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
-            int weightColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
+            int idColumnIndex = cursor.getColumnIndex(PetEntry._ID);
+            int nameColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_NAME);
+            int breedComunIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_BREED);
+            int genderColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
+            int weightColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
 
             // Build a String to display with StringBuilder
             StringBuilder sb = new StringBuilder();
-            sb.append("Number of rows in pets database table: " + c.getCount() + "\n");
+            sb.append("Number of rows in pets database table: " + cursor.getCount() + "\n");
             sb.append("\n");
             sb.append("id - name - breed - gender - weight");
             sb.append("\n");
@@ -112,12 +107,12 @@ public class CatalogActivity extends AppCompatActivity {
             String petGender = "";
 
             // Logic to build the string to display
-            while (c.moveToNext()){
+            while (cursor.moveToNext()){
                 sb.append("\n");
-                sb.append(c.getInt(idColumnIndex) + " - ");
-                sb.append(c.getString(nameColumnIndex) + " - ");
-                sb.append(c.getString(breedComunIndex) + " - ");
-                switch (c.getInt(genderColumnIndex)){
+                sb.append(cursor.getInt(idColumnIndex) + " - ");
+                sb.append(cursor.getString(nameColumnIndex) + " - ");
+                sb.append(cursor.getString(breedComunIndex) + " - ");
+                switch (cursor.getInt(genderColumnIndex)){
                     case PetEntry.GENDER_MALE:
                         petGender = getString(R.string.gender_male);
                         break;
@@ -129,13 +124,13 @@ public class CatalogActivity extends AppCompatActivity {
                         break;
                 }
                 sb.append(petGender + " - ");
-                sb.append(c.getInt(weightColumnIndex));
+                sb.append(cursor.getInt(weightColumnIndex));
             }
             displayView.setText(sb.toString());
         } finally {
             // Always close the cursor when you're done reading from it. This releases all its
             // resources and makes it invalid.
-            c.close();
+            cursor.close();
         }
     }
 
