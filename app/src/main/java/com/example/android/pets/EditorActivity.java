@@ -15,12 +15,15 @@
  */
 package com.example.android.pets;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +35,6 @@ import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract;
 import com.example.android.pets.data.PetContract.PetEntry;
-import com.example.android.pets.data.PetDbHelper;
 
 /**
  * Allows user to create a new pet or edit an existing one.
@@ -114,8 +116,6 @@ public class EditorActivity extends AppCompatActivity {
 
     // Helper function to insert a pet into the table
     private void insertPet(){
-        PetDbHelper mDbHelper = new PetDbHelper(this);
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
@@ -127,13 +127,11 @@ public class EditorActivity extends AppCompatActivity {
         values.put(PetEntry.COLUMN_PET_GENDER, mGender);
         values.put(PetEntry.COLUMN_PET_WEIGHT, weightInt);
 
-        long insertRowId = db.insert(PetEntry.TABLE_NAME, null, values);
-
-        // Display a toast if there was an error inserting pet or if it was successful
-        if (insertRowId == -1){
-            Toast.makeText(getApplicationContext(), "Error with saving the pet", Toast.LENGTH_SHORT).show();
-        } else
-            Toast.makeText(getApplicationContext(), "Pet saved with id: " + insertRowId, Toast.LENGTH_SHORT).show();;
+        Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
+        if (newUri == null) {
+            Toast.makeText(getApplicationContext(), getString(R.string.toast_error_save), Toast.LENGTH_SHORT).show();
+        }else
+            Toast.makeText(getApplicationContext(), getString(R.string.toast_pet_saved), Toast.LENGTH_SHORT).show();
     }
 
     @Override
