@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.android.pets.data.PetContract.PetEntry;
@@ -56,6 +57,8 @@ public class CatalogActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+
     }
 
     @Override
@@ -79,53 +82,13 @@ public class CatalogActivity extends AppCompatActivity {
 
         Cursor cursor = getContentResolver().query(PetEntry.CONTENT_URI, projection, null, null, null);
 
-        // Find TextView on which to display data from the cursor
-        TextView displayView = (TextView) findViewById(R.id.text_view_pet);
+        // Find ListView to populate
+        ListView listView = (ListView) findViewById(R.id.list_view);
+        // Setup cursor adapter using cursor from last step
+        PetCursorAdapter petCursorAdapter = new PetCursorAdapter(this, cursor);
+        // Attach cursor adapter to the ListView
+        listView.setAdapter(petCursorAdapter);
 
-        try {
-
-            // Find index of each column we want data from
-            int idColumnIndex = cursor.getColumnIndex(PetEntry._ID);
-            int nameColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_NAME);
-            int breedComunIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_BREED);
-            int genderColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
-            int weightColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
-
-            // Build a String to display with StringBuilder
-            StringBuilder sb = new StringBuilder();
-            sb.append("Number of rows in pets database table: " + cursor.getCount() + "\n");
-            sb.append("\n");
-            sb.append("id - name - breed - gender - weight");
-            sb.append("\n");
-            // Gender of a pet to display
-            String petGender = "";
-
-            // Logic to build the string to display
-            while (cursor.moveToNext()){
-                sb.append("\n");
-                sb.append(cursor.getInt(idColumnIndex) + " - ");
-                sb.append(cursor.getString(nameColumnIndex) + " - ");
-                sb.append(cursor.getString(breedComunIndex) + " - ");
-                switch (cursor.getInt(genderColumnIndex)){
-                    case PetEntry.GENDER_MALE:
-                        petGender = getString(R.string.gender_male);
-                        break;
-                    case PetEntry.GENDER_FEMALE:
-                        petGender = getString(R.string.gender_female);
-                        break;
-                    default:
-                        petGender = getString(R.string.gender_unknown);
-                        break;
-                }
-                sb.append(petGender + " - ");
-                sb.append(cursor.getInt(weightColumnIndex));
-            }
-            displayView.setText(sb.toString());
-        } finally {
-            // Always close the cursor when you're done reading from it. This releases all its
-            // resources and makes it invalid.
-            cursor.close();
-        }
     }
 
     // Helper method to insert dummy data
