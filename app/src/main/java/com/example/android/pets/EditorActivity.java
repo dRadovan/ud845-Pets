@@ -59,11 +59,19 @@ public class EditorActivity extends AppCompatActivity {
      * 0 for unknown gender, 1 for male, 2 for female.
      */
     private int mGender = PetContract.PetEntry.GENDER_UNKNOWN;
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+
+        // Get URI from the intent that started this activity
+        Uri itemUri = getIntent().getData();
+        if (itemUri != null){
+            getSupportActionBar().setTitle(getString(R.string.editor_activity_title_edit_pet));
+        } else {
+            getSupportActionBar().setTitle(getString(R.string.editor_activity_title_new_pet));
+        }
 
         // Find all relevant views that we will need to read user input from
         mNameEditText = (EditText) findViewById(R.id.edit_pet_name);
