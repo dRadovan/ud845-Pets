@@ -98,6 +98,9 @@ public class PetProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);
         }
+        // Set notification URI on the cursor before returning it
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
         return cursor;    }
 
     /**
@@ -115,6 +118,7 @@ public class PetProvider extends ContentProvider {
             default:
                 throw new IllegalStateException("Unknown URI " + uri + " with match " + match);
         }
+
     }
 
     /**
@@ -140,20 +144,28 @@ public class PetProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
-
+        int delCount;
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case PETS:
                 // Delete all rows that match the selection and selection args
-                return database.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
+                delCount = database.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             case PET_ID:
                 // Delete a single row given by the ID in the URI
                 selection = PetEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
-                return database.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
+                delCount = database.delete(PetEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             default:
                 throw new IllegalArgumentException("Deletion is not supported for " + uri);
         }
+
+        if (delCount != 0){
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return delCount;
     }
 
     /**
@@ -216,7 +228,13 @@ public class PetProvider extends ContentProvider {
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
-        return database.update(PetEntry.TABLE_NAME, values, selection, selectionArgs);
+        int updatedRows = database.update(PetEntry.TABLE_NAME, values, selection, selectionArgs);
+
+        if (updatedRows != 0){
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return updatedRows;
     }
 
     /**
@@ -253,7 +271,10 @@ public class PetProvider extends ContentProvider {
             return null;
         }
 
+        Uri itemUri = ContentUris.withAppendedId(uri, id);
+        getContext().getContentResolver().notifyChange(itemUri, null);
+
         // Return the new URI with the ID (of the newly inserted row) appended at the end
-        return ContentUris.withAppendedId(uri, id);
+        return itemUri;
     }
 }
