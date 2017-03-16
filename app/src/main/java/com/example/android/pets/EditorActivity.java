@@ -20,14 +20,12 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -134,7 +132,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     // Helper function to insert a pet into the table
-    private void insertPet(){
+    private void savePet(){
 
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
@@ -146,11 +144,22 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(PetEntry.COLUMN_PET_GENDER, mGender);
         values.put(PetEntry.COLUMN_PET_WEIGHT, weightInt);
 
-        Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
-        if (newUri == null) {
-            Toast.makeText(getApplicationContext(), getString(R.string.toast_error_save), Toast.LENGTH_SHORT).show();
-        }else
-            Toast.makeText(getApplicationContext(), getString(R.string.toast_pet_saved), Toast.LENGTH_SHORT).show();
+        // Check in which mode is the activity
+        if (mItemUri != null){ /*edit pet mode */
+            int updatedRow = getContentResolver().update(mItemUri, values, null, null);
+            if (updatedRow > 0){
+                Toast.makeText(this, getString(R.string.toast_pet_updated), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.toast_error_update), Toast.LENGTH_SHORT).show();
+            }
+        } else { /* new pet mode */
+            Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
+            if (newUri == null) {
+                Toast.makeText(getApplicationContext(), getString(R.string.toast_error_save), Toast.LENGTH_SHORT).show();
+            }else
+                Toast.makeText(getApplicationContext(), getString(R.string.toast_pet_saved), Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
@@ -167,7 +176,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                insertPet();
+                savePet();
                 // exit the activity
                 finish();
                 return true;
@@ -202,7 +211,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         if (data == null || data.getCount() < 1){
             return;
         }
-        
+
         // Move to first row in the cursor and read data from it
         if (data.moveToFirst()) {
             // Retrieve data from cursor
