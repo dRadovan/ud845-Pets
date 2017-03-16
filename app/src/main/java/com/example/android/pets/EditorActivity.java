@@ -95,6 +95,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             getLoaderManager().initLoader(PET_LOADER, null, this);
         } else {
             setTitle(getString(R.string.editor_activity_title_new_pet));
+            // no sense in deleting a pet if we're inserting a new one
+            invalidateOptionsMenu();
         }
 
         // Find all relevant views that we will need to read user input from
@@ -240,6 +242,17 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        // If this is a new pet, hide the "Delete" menu item.
+        if (mItemUri == null) {
+            MenuItem menuItem = menu.findItem(R.id.action_delete);
+            menuItem.setVisible(false);
+        }
+        return true;
     }
 
     @Override
