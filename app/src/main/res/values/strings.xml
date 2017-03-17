@@ -101,7 +101,11 @@
     <!-- Dialog button text for the option to cancel deletion of the current pet [CHAR LIMIT=20] -->
     <string name="cancel">Cancel</string>
 
+    <!--labels for the delete all dialog-->
     <string name="delete_all_dialog">This will delete all pets from the database</string>
     <string name="proceed_delete_all">Proceed</string>
     <string name="halt_delete_all">No</string>
+
+    <!--text to show when the breed is unknowsn-->
+    <string name="unknown_breed">Unknown Breed</string>
 </resources>
