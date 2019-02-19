@@ -1,6 +1,8 @@
 Pets App
 ===================================
 
+Pets is the companion Android app for the Udacity course [Android Basics: Data Storage](https://eu.udacity.com/course/android-basics-data-storage--ud845).
+
 This app displays a list of pets and their related data that the user inputs.
 Used in a Udacity course in the Android Basics Nanodegree by Google.
 
